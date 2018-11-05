@@ -27,16 +27,16 @@ class Griduniverse2(dallinger.experiment.Experiment):
         """Initialize the experiment."""
         super(Griduniverse2, self).__init__(session)
         self.num_players = config.get("num_players")
-        self.game_duration = config.get("game_duration"),
-        self.include_human = config.get("include_human"),
-        self.bot_strategy = config.get("bot_strategy"),
-        self.rows = config.get("rows"),
-        self.columns = config.get("columns"),
-        self.num_food = config.get("num_food"),
-        self.visibility = config.get("visibility"),
-        self.bot_motion_rate = config.get("bot_motion_rate"),
-        self.block_size = config.get("block_size"),
-        self.block_padding = config.get("block_padding"),
+        self.game_duration = config.get("game_duration")
+        self.include_human = config.get("include_human")
+        self.bot_strategy = config.get("bot_strategy")
+        self.rows = config.get("rows")
+        self.columns = config.get("columns")
+        self.num_food = config.get("num_food")
+        self.visibility = config.get("visibility")
+        self.bot_motion_rate = config.get("bot_motion_rate")
+        self.block_size = config.get("block_size")
+        self.block_padding = config.get("block_padding")
         self.seed = config.get("seed")
         self.experiment_repeats = 1
         self.initial_recruitment_size = config.get("n")

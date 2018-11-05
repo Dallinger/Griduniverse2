@@ -27,17 +27,17 @@
     <script>
       game = ACSG({ 'config': {
         NUM_PLAYERS: {{ experiment.num_players }},
-        DURATION: 6,
-        INCLUDE_HUMAN: true,
-        BOT_STRATEGY: 'random',
-        ROWS: 25,
-        COLUMNS: 25,
-        NUM_FOOD: 8,
-        VISIBILITY: 40,
-        BOT_MOTION_RATE: 8,
-        BLOCK_SIZE: 12,
-        BLOCK_PADDING: 1,
-        SEED: '19145822647'
+        DURATION: {{ experiment.game_duration }},
+        INCLUDE_HUMAN: {% if experiment.include_human %}true{% else %}false{% endif %},
+        BOT_STRATEGY: {{ experiment.bot_strategy|safe }},
+        ROWS: {{ experiment.rows }},
+        COLUMNS: {{ experiment.columns }},
+        NUM_FOOD: {{ experiment.num_food }},
+        VISIBILITY: {{ experiment.visibility }},
+        BOT_MOTION_RATE: {{ experiment.bot_motion_rate }},
+        BLOCK_SIZE: {{ experiment.block_size }},
+        BLOCK_PADDING: {{ experiment.block_padding }},
+        SEED: {{ experiment.seed|safe }}
       }})
 
       game.run(function () {

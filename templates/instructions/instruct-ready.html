@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block body %}<head>
+    <div class="main_div">
+
+        <h1>Instructions</h1>
+
+        <hr>
+
+        <p>Play the game.</p>
+
+        <hr>
+
+        <div>
+            <div class="row">
+                <div class="col-xs-10"></div>
+                <div class="col-xs-2">
+                    <button type="button" class="btn btn-success btn-lg" onClick="dallinger.goToPage('experiment');">
+                    Begin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        dallinger.createParticipant();
+    </script>
+{% endblock %}

@@ -1,1 +1,1 @@
-dallinger==5.0.0
+-e git://github.com/Dallinger/Dallinger.git@stories/434-dallinger-demos#egg=dallinger[data]

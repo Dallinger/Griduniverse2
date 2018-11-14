@@ -9,84 +9,6 @@ var gaussian = require('gaussian')
 var Rands = require('rands')
 var seedrandom = require('seedrandom')
 const uuidv4 = require('uuid/v4')
-NBots=16
-var Mat= new Array(NBots)
-for (var i=0;i<NBots;i++){
-  Mat[i]=new Array(NBots)
-}
-for (var i=0;i<NBots;i++){
-  for (var j=0;j<NBots;j++){
-    Mat[i][j]=0
-  }
-}
-Mat[0][1]=1;Mat[0][2]=1;Mat[0][3]=1;Mat[1][0]=1;Mat[1][2]=1;Mat[1][3]=1;
-Mat[2][1]=1;Mat[2][0]=1;Mat[2][3]=1;Mat[3][1]=1;Mat[3][2]=1;Mat[3][0]=1;Mat[4][5]=1;Mat[4][6]=1;
-Mat[4][7]=1;Mat[5][4]=1;Mat[5][6]=1;Mat[5][7]=1;Mat[6][4]=1;Mat[6][5]=1;Mat[6][7]=1;Mat[7][4]=1;
-Mat[7][5]=1;Mat[7][6]=1;Mat[8][9]=1;Mat[8][10]=1;Mat[8][11]=1;Mat[9][8]=1;Mat[9][10]=1;Mat[9][11]=1;
-Mat[10][8]=1;Mat[10][9]=1;Mat[10][11]=1;Mat[11][8]=1;Mat[11][9]=1;Mat[11][10]=1;Mat[12][13]=1;Mat[12][14]=1;
-Mat[12][15]=1;Mat[13][11]=1;Mat[13][14]=1;Mat[13][15]=1;Mat[14][11]=1;Mat[14][13]=1;Mat[14][15]=1;Mat[15][11]=1;Mat[15][13]=1;Mat[15][14]=1;
-Mat1=Mat.slice()
-
-Mat[0][1]=1;Mat[0][8]=1;
-Mat[0][9]=1;Mat[1][0]=1;Mat[1][8]=1;Mat[1][9]=1;Mat[8][1]=1;Mat[8][0]=1;Mat[8][9]=1;Mat[9][1]=1;
-Mat[9][8]=1;Mat[9][0]=1;Mat[2][3]=1;Mat[2][10]=1;Mat[2][11]=1;Mat[3][2]=1;Mat[3][10]=1;Mat[3][11]=1;
-Mat[10][3]=1;Mat[10][2]=1;Mat[10][11]=1;Mat[11][3]=1;Mat[11][10]=1;Mat[11][2]=1;Mat[4][5]=1;Mat[4][12]=1;
-Mat[4][13]=1;Mat[5][4]=1;Mat[5][12]=1;Mat[5][13]=1;Mat[12][5]=1;Mat[12][4]=1;Mat[12][13]=1;Mat[13][5]=1;
-Mat[13][12]=1;Mat[13][4]=1;Mat[6][7]=1;Mat[6][14]=1;Mat[6][15]=1;Mat[7][6]=1;Mat[7][14]=1;Mat[7][15]=1;
-Mat[14][7]=1;Mat[14][6]=1;Mat[14][15]=1;Mat[15][7]=1;Mat[15][14]=1;Mat[15][6]=1;
-Mat2=Mat.slice()
-
-function rewire(Matrix){
-  NBots=16
-  Team=[]
-  for (var i=0;i<NBots;i++){
-      if (i <=8){
-          Team.push(0)
-        }
-      else{
-          Team.push(1)
-        }
-    }
-  for (var i=0;i<10000;i++){
-      stateX1=Math.floor(Math.random()*NBots)
-      stateY1=Math.floor(Math.random()*NBots)
-      stateX2=Math.floor(Math.random()*NBots)
-      stateY2=Math.floor(Math.random()*NBots)
-
-      while (true){
-          if (stateX1!=stateY1  && stateX1!=stateY2 && stateX1!=stateX2 && stateY1!=stateX2 && stateY1!=stateY2 && stateX2!=stateY2 
-          && Matrix[stateX1][stateY1]==1 && Matrix[stateX2][stateY2]==1 && Matrix[stateX1][stateY2]==0 
-          && Matrix[stateX2][stateY1]==0 && Team[stateY2]==Team[stateY1]){
-             
-
-              break
-          }
-          stateX1=Math.floor(Math.random()*NBots)
-          stateY1=Math.floor(Math.random()*NBots)
-          stateX2=Math.floor(Math.random()*NBots)
-          stateY2=Math.floor(Math.random()*NBots)
-
-          }
-
-      Matrix[stateX1][stateY1]=0
-      Matrix[stateX2][stateY2]=0
-      Matrix[stateX1][stateY2]=1
-      Matrix[stateX2][stateY1]=1
-    }
-    return(Matrix)
-  }
-
-
-function shuffle(a) {
-    var j, x, i;
-    for (i = a.length - 1; i > 0; i--) {
-        j = Math.floor(Math.random() * (i + 1));
-        x = a[i];
-        a[i] = a[j];
-        a[j] = x;
-    }
-    return a;
-}
 
 function ACSG (g) {
   if (!(this instanceof ACSG)) return new ACSG(g)
@@ -111,21 +33,12 @@ function ACSG (g) {
     opts.BOT_MOTION_RATE = opts.BOT_MOTION_RATE || 8
     opts.BLOCK_SIZE = opts.BLOCK_SIZE || 15
     opts.BLOCK_PADDING = opts.BLOCK_PADDING || 1
-    opts.MAT_cond=opts.MAT_COND || 0
     opts.SEED = opts.SEED || performance.now()
     opts.BOT_STRATEGY = opts.BOT_STRATEGY || 'random'
-    opts.COLOR_COND=opts.COLOR_COND||0
     this.UUID = uuidv4()
     replay = false
     actions = []
     actionTimestamps = []
-  }
-
-  if (opts.MAT_cond==0){
-    Mat=rewire(Mat1)
-  }
-  if (opts.MAT_cond==1){
-    Mat=rewire(Mat2)
   }
 
   // Seed event RNG.
@@ -143,22 +56,16 @@ function ACSG (g) {
   }
 
   GREEN = [0.51, 0.95, 0.61]
-  if (opts.COLOR_COND==0){
-      teamColors = [
-        [0.50, 0.86, 1.00], // Blue
-        [1.00, 0.86, 0.50] // Yellow
-      ]
-  }
-  if (opts.COLOR_COND==1){
-    teamColors = [
-      [1.00, 0.86, 0.50], // Yellow
-      [0.50, 0.86, 1.00] // Blue
-    ]
-}
 
+  teamColors = [
+    [0.50, 0.86, 1.00], // Blue
+    [1.00, 0.86, 0.50] // Yellow
+  ]
 
   food = []
   players = []
+  this.players = players
+  states = []
   gameOver = false
 
   var data = []
@@ -183,12 +90,49 @@ function ACSG (g) {
   this.serialize = function () {
     return JSON.stringify({
       'id': this.UUID,
-      'daopts.MAT_condta': {
+      'data': {
         'actions': actions,
         'timestamps': actionTimestamps
       },
       'config': opts
     })
+  }
+
+  this.serialize2 = function () {
+    return JSON.stringify({
+      'id': this.UUID,
+      'data': {
+        'actions': actions,
+        'timestamps': actionTimestamps
+      },
+      'config': opts,
+      'states': states,
+      'players': players,
+      'food': food
+    })
+  }
+
+  // // Download the serialized game as a JSON file.
+  this.download = function () {
+    var blob = new Blob([this.serialize2()], {type: 'application/json'})
+    var url = URL.createObjectURL(blob)
+    var el = document.createElement('a')
+    el.style.display = 'none'
+    el.id = 'downloadAnchorElem'
+    el.href = url
+    el.download = 'game.json'
+    el.textContent = 'Download backup.json'
+    document.body.appendChild(el)
+    el.click()
+  }
+
+  state = function (t) {
+    s = {
+      'timestamp': t,
+      'players': players,
+      'food': food
+    }
+    return s
   }
 
   function randomPosition () {
@@ -232,25 +176,10 @@ function ACSG (g) {
     config = config || {}
     this.id = config.id || players.length
     this.position = config.position || randomPosition()
-    this.direction ='' 
-    if (this.id<8){
-      this.teamIdx =0 
-    }else{
-      this.teamIdx=1
-    }
-
-    //this.teamIdx = Math.floor(Math.random() * teamColors.length)
+    this.teamIdx = Math.floor(Math.random() * teamColors.length)
     this.color = config.color || teamColors[this.teamIdx]
     this.score = config.score || 0
     this.bot = config.bot || false
-    this.history = {
-      'actions': [],
-      'positions': [],
-      'timestamps': []
-    }
-    this.history.positions.push(this.position)
-    this.history.timestamps.push(0)
-    this.history.actions.push(null)
     return this
   }
 
@@ -286,7 +215,6 @@ function ACSG (g) {
     }
     if (!hasPlayer(newPosition)) {
       this.position = newPosition
-      this.direction=direction
     }
   }
 
@@ -309,8 +237,6 @@ function ACSG (g) {
   Bot = function (config) {
     Player.call(this, config)
     this.bot = true
-    this.target=randomPosition()
-//    console.log('target: '+this.target)
   }
 
   Bot.prototype = Object.create(Player.prototype)
@@ -319,22 +245,8 @@ function ACSG (g) {
     if (opts.BOT_STRATEGY == 'random') {
       direction = this.strategy.random()
     }
-    if (opts.BOT_STRATEGY == 'flockingBot') {
-      if (this.position[0]==this.target[0] &&  this.position[1]==this.target[1]){
-   //   console.log('target reached! new target is set')
-      this.target=randomPosition()
-   //   console.log('target: '+this.target)
-
-      }
-      direction = this.strategy.flockingBot(this.id,this.position,this.target)
-    }
-
     botActions.push(direction)
-    this.history.actions.push(direction)
-    this.direction=direction
     Player.prototype.move.call(this, direction)
-    //console.log('target: '+this.target)
-  //  console.log('position: '+this.position)
   }
 
   Bot.prototype.strategy = {}
@@ -342,108 +254,6 @@ function ACSG (g) {
   Bot.prototype.strategy.random = function () {
     dirs = ['up', 'down', 'left', 'right']
     return dirs[Math.floor(Math.random() * dirs.length)]
-  }
-
-  Bot.prototype.strategy.flockingBot = function (thisID,position,target) {
-    var hor=10
-    var RR=1
-
-  //  console.log('position ' + position)
-  //  console.log('target ' + target)
-    dir=''
-
-    var food_found=0
-    var player_found=0
-    var food_positions=[]
-    var players_idx=[]
-
-    for (var i = 0; i < food.length; i++) {
-      food_positions.push(food[i].position)
-    }
-    shuffle(food_positions)
-
-    for (var i = 0; i < food.length; i++) {
-      console.log()
-      if (Math.abs(food_positions[i][0]-position[0])<=hor/2 && Math.abs(food_positions[i][1]-position[1])<=hor/2){
-       // console.log('food found!')
-
-        if (position[0]<food_positions[i][0]){
-          dir='down'
-        }
-        if (position[0]>food_positions[i][0]){
-          dir='up'
-        }    
-        if (position[1]<food_positions[i][1]){
-          dir='right'
-        }    
-        if (position[1]>food_positions[i][1]){
-          dir='left'
-        }
-        food_found=1
-        break
-
-      }
-
-    }
-
-    if (food_found==0){
-
-      for (var i = 0; i < players.length; i++) {
-        players_idx.push(i)
-      }
-
-      shuffle(players_idx)
-
-  //    console.log('player pos: '+players[0].position+ ' self pos: '+position)
-
-      for (var i = 0; i < players.length; i++) {
-//       console.log(players[players_idx[i]].position)
-        if (!(players[players_idx[i]].position[0]==position[0] && players[players_idx[i]].position[1]==position[1]) ){
-//          console.log('player pos: '+players[players_idx[i]].position+ ' self pos: '+position)
-   
- 
-
-          if (Math.abs(players[players_idx[i]].position[0]-position[0])<hor/2 && Math.abs(players[players_idx[i]].position[1]-position[1])<hor/2){
-      //      console.log('player found!')
-            //console.log(position)
-        //    console.log('player dir: ' +players[players_idx[i]].direction)
-          	if ( !(position[0]<=0 && players[players_idx[i]].direction=='up') && !(position[0]>=opts.COLUMNS-1 && players[players_idx[i]].direction=='down') &&
-				 !(position[1]<=0 && players[players_idx[i]].direction=='left') && !(position[1]>=opts.ROWS-1 && players[players_idx[i]].direction=='right') 
-          		){
-              if (players[players_idx[i]].direction=='up' || players[players_idx[i]].direction=='down' || players[players_idx[i]].direction=='right' ||players[players_idx[i]].direction=='left'){
-            	//	console.log('move with player dir')
-                if (Mat[thisID][players_idx[i]]==1){
-    	            dir=players[players_idx[i]].direction
-    	            player_found=1
-    	            break
-                }
-              }
-        	}
-
-          }
-        }
-
-      }
-    }
-        
-    if (food_found==0 && player_found==0){
-
-    //	console.log('follow target')
-      if (position[0]<target[0]){
-        dir='down'
-      }
-      if (position[0]>target[0]){
-        dir='up'
-      }    
-      if (position[1]<target[1]){
-        dir='right'
-      }    
-      if (position[1]>target[1]){
-        dir='left'
-      }
-    }
-
-    return dir
   }
 
   // Create the human.
@@ -480,35 +290,31 @@ function ACSG (g) {
     document.getElementById('score').innerHTML = players[0].score
   }
 
+  function updateClock (t) {
+    document.getElementById('clock').innerHTML = ((t > 0) ? t.toFixed(1) : '0.0')
+  }
+
   this.run = function (callback) {
     callback = callback || function () { console.log('Game finished.') }
     start = performance.now()
+
+    states.push(state(0))
 
     // Pregenerate bot motion timings, sans direction.
     botActionTimestamps = []
     botActions = []
     whichBotMoves = []
     t = 0
-    var idx =0
     humanOffset = opts.INCLUDE_HUMAN ? 1 : 0
-   // console.log('wait time '+ opts.BOT_MOTION_RATE * this._NUM_BOTS)
     while (true) {
       waitTime = r.exponential(opts.BOT_MOTION_RATE * this._NUM_BOTS)
-    //  waitTime=.1/this._NUM_BOTS
       if (t + waitTime > opts.DURATION) {
         break
       }
       t += waitTime
       botActionTimestamps.push(t)
       idx = Math.floor(Math.random() * this._NUM_BOTS) + humanOffset
-  	  whichBotMoves.push(idx)
-//      whichBotMoves.push(idx+humanOffset)
-      
-    
- //     idx+=1
-  //     if (idx>=this._NUM_BOTS){
-  //    	idx=0
-   //   }
+      whichBotMoves.push(idx)
     }
     lastBotActionIdx = -1
     lastHumanActionIdx = -1
@@ -542,15 +348,13 @@ function ACSG (g) {
           currentBot = players[whichBotMoves[lastBotActionIdx]]
           currentBot.move()
           currentBot.consume()
-          currentBot.history.positions.push(currentBot.position)
-          currentBot.history.timestamps.push(nextBotT)
+          states.push(this.state(nextBotT))
         } else {
           // Carry out human action.
           lastHumanActionIdx += 1
           players[0].move(actions[lastHumanActionIdx])
           players[0].consume()
-          players[0].history.positions.push(currentBot.position)
-          players[0].history.timestamps.push(nextHumanT)
+          states.push(this.state(nextHumanT))
         }
       }
 
@@ -572,6 +376,9 @@ function ACSG (g) {
       food.forEach(function (f) {
         data[(f.position[0]) * opts.COLUMNS + f.position[1]] = f.color
       })
+
+      // Update the clock.
+      updateClock(opts.DURATION - elapsedTime)
 
       // Add the Gaussian mask.
       var g = gaussian(0, Math.pow(opts.VISIBILITY, 2))
@@ -636,34 +443,7 @@ function ACSG (g) {
 
 module.exports = ACSG
 
-},{"./pixels":69,"dom-css":6,"gaussian":9,"mouse-position":15,"mousetrap":16,"parse-color":17,"rands":21,"seedrandom":55,"util":76,"uuid/v4":68}],2:[function(require,module,exports){
-var ACSG = require('./acsg')
-game = ACSG({ 'config': {
-  NUM_PLAYERS: 16,
-  DURATION: 120,
-  INCLUDE_HUMAN: true,
-  BOT_STRATEGY: 'flockingBot',
-  ROWS: 45,
-  COLUMNS: 45,
-  NUM_FOOD: 8,
-  VISIBILITY: 50,
-  BOT_MOTION_RATE: 8,
-  BLOCK_SIZE: 12,
-  BLOCK_PADDING: 1,
-  MAT_COND:1,
-  COLOR_COND:1,
-  SEED: '19145822646'
-}})
-
-game.run(function () { console.log(game.serialize()) })
-
-// g = {'id': '9ecf49af-b9b6-42a4-bb17-9d833f2fef99', 'data': {'actions': ['right', 'right', 'right', 'up', 'left', 'left', 'up', 'up', 'up', 'up', 'up', 'right', 'down', 'down', 'down', 'down', 'down', 'down', 'down', 'down', 'left', 'left', 'down', 'down', 'left', 'down', 'down', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'down', 'down', 'down', 'down', 'down', 'down', 'down', 'down', 'right', 'right', 'right', 'down', 'down', 'right', 'right', 'right', 'right', 'right', 'up', 'down', 'down', 'right', 'right', 'right', 'right', 'left', 'left', 'up', 'up', 'left', 'up', 'up', 'up', 'up', 'left', 'left', 'up', 'up', 'up', 'left', 'up', 'up', 'up', 'up', 'up', 'up', 'up', 'up', 'up', 'right', 'right', 'down', 'down', 'down', 'down', 'down', 'down', 'down', 'down', 'up', 'up', 'up', 'up', 'up', 'up', 'up', 'up', 'up', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'up', 'up', 'up', 'up', 'up', 'left', 'left', 'left', 'left', 'left', 'left', 'left', 'left', 'down', 'down', 'left', 'left', 'down', 'down', 'left', 'left', 'left', 'left'], 'timestamps': [0.3936000000103377, 0.561199999996461, 0.7281000000075437, 0.8938000000198372, 1.0938000000023749, 1.2613000000128523, 1.377200000017183, 1.5278000000107568, 1.6604999999981374, 1.8270999999949709, 1.9605000000155997, 2.160200000012992, 2.343800000002375, 2.493900000001304, 2.6098000000056345, 2.7761999999929685, 2.9275000000197906, 3.0605000000214204, 3.2098000000114553, 3.3769000000029337, 3.4611000000149943, 3.6107999999949243, 3.760500000003958, 3.8932000000204425, 4.027100000006612, 4.193800000008196, 4.343699999997625, 4.510399999999208, 4.644300000014482, 4.7766000000119675, 4.910800000012387, 5.044099999999162, 5.159400000004098, 5.310300000011921, 5.443499999993946, 5.593599999992875, 5.727100000018254, 5.84340000001248, 5.992800000007264, 6.110600000014529, 6.242800000007264, 6.394100000004983, 6.510800000018207, 6.642600000021048, 6.794300000008661, 6.9267000000108965, 7.110799999994924, 7.243900000001304, 7.4275999999954365, 7.560900000011316, 7.710600000020349, 7.860500000009779, 8.010800000018207, 8.159400000004098, 8.359800000005635, 8.510899999993853, 8.593900000007125, 8.743700000020908, 8.876400000008289, 9.027400000020862, 9.192800000018906, 9.359700000000885, 9.410800000012387, 9.544099999999162, 9.626799999998184, 9.742499999993015, 9.926200000016252, 10.093599999992875, 10.260399999999208, 10.35920000000624, 10.527400000020862, 10.677200000005541, 10.827699999994365, 10.9600999999966, 11.143700000015087, 11.309999999997672, 11.477100000018254, 11.644000000000233, 11.793700000009267, 11.94330000001355, 12.09350000001723, 12.243500000011409, 12.376300000003539, 12.527400000020862, 12.627200000017183, 12.777400000020862, 12.893200000020443, 13.043900000018766, 13.192899999994552, 13.32719999999972, 13.459900000016205, 13.610500000009779, 13.743700000020908, 13.910399999993388, 14.075800000020536, 14.22609999999986, 14.377299999992829, 14.527000000001863, 14.660200000012992, 14.810599999997066, 14.96020000000135, 15.109800000005635, 15.277200000011362, 15.51469999999972, 15.62609999999404, 15.777300000016112, 15.892500000016298, 16.043800000014016, 16.193800000008196, 16.34320000000298, 16.49350000001141, 16.643800000019837, 16.793800000014016, 16.943499999993946, 17.092700000008335, 17.260500000003958, 17.392500000016298, 17.55999999999767, 17.71020000000135, 17.86040000000503, 18.025900000007823, 18.176700000010896, 18.35950000002049, 18.443700000003446, 18.527000000001863, 18.693900000012945, 18.842499999998836, 18.993700000020908, 19.159400000004098, 19.30920000001788, 19.477000000013504, 19.659299999999348, 19.793900000018766]}, 'config': {'NUM_PLAYERS': 9, 'DURATION': 20, 'INCLUDE_HUMAN': true, 'BOT_STRATEGY': 'random', 'ROWS': 25, 'COLUMNS': 25, 'NUM_FOOD': 8, 'VISIBILITY': 50, 'BOT_MOTION_RATE': 4, 'BLOCK_SIZE': 12, 'BLOCK_PADDING': 1, 'SEED': '19145822646'}}
-//
-// game = ACSG(g)
-//
-// game.run()
-
-},{"./acsg":1}],3:[function(require,module,exports){
+},{"./pixels":68,"dom-css":5,"gaussian":8,"mouse-position":14,"mousetrap":15,"parse-color":16,"rands":20,"seedrandom":54,"util":75,"uuid/v4":67}],2:[function(require,module,exports){
 /* The following list is defined in React's core */
 var IS_UNITLESS = {
   animationIterationCount: true,
@@ -705,7 +485,7 @@ module.exports = function(name, value) {
     return value;
   }
 };
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /* MIT license */
 
 module.exports = {
@@ -1405,7 +1185,7 @@ for (var key in cssKeywords) {
   reverseKeywords[JSON.stringify(cssKeywords[key])] = key;
 }
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var conversions = require("./conversions");
 
 var convert = function() {
@@ -1498,7 +1278,7 @@ Converter.prototype.getValues = function(space) {
 });
 
 module.exports = convert;
-},{"./conversions":4}],6:[function(require,module,exports){
+},{"./conversions":3}],5:[function(require,module,exports){
 var prefix = require('prefix-style')
 var toCamelCase = require('to-camel-case')
 var cache = { 'float': 'cssFloat' }
@@ -1561,7 +1341,7 @@ module.exports.get = function (element, properties) {
   }
 }
 
-},{"add-px-to-style":3,"prefix-style":18,"to-camel-case":63}],7:[function(require,module,exports){
+},{"add-px-to-style":2,"prefix-style":17,"to-camel-case":62}],6:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1865,7 +1645,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 module.exports = function flatten(list, depth) {
   depth = (typeof depth == 'number') ? depth : Infinity;
 
@@ -1890,7 +1670,7 @@ module.exports = function flatten(list, depth) {
   }
 };
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function(exports) {
 
   // Complementary error function
@@ -2005,7 +1785,7 @@ module.exports = function flatten(list, depth) {
     ? function(e) { module.exports = e; }
     : function(e) { this["gaussian"] = e; });
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 /**
  * isArray
@@ -2040,7 +1820,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -2063,7 +1843,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /*!
  * is-number <https://github.com/jonschlinkert/is-number>
  *
@@ -2084,7 +1864,7 @@ module.exports = function isNumber(num) {
   return (n - n + 1) >= 0 && num !== '';
 };
 
-},{"kind-of":14}],13:[function(require,module,exports){
+},{"kind-of":13}],12:[function(require,module,exports){
 'use strict';
 
 var strValue = String.prototype.valueOf;
@@ -2106,7 +1886,7 @@ module.exports = function isString(value) {
 	return hasToStringTag ? tryStringObject(value) : toStr.call(value) === strClass;
 };
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var isBuffer = require('is-buffer');
 var toString = Object.prototype.toString;
 
@@ -2224,7 +2004,7 @@ module.exports = function kindOf(val) {
   return 'object';
 };
 
-},{"is-buffer":11}],15:[function(require,module,exports){
+},{"is-buffer":10}],14:[function(require,module,exports){
 var Emitter = require('events/')
 
 module.exports = attach
@@ -2276,7 +2056,7 @@ function attach(element, listener) {
 
 }
 
-},{"events/":7}],16:[function(require,module,exports){
+},{"events/":6}],15:[function(require,module,exports){
 /*global define:false */
 /**
  * Copyright 2012-2017 Craig Campbell
@@ -3322,7 +3102,7 @@ function attach(element, listener) {
     }
 }) (typeof window !== 'undefined' ? window : null, typeof  window !== 'undefined' ? document : null);
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var convert = require('color-convert');
 
 module.exports = function (cstr) {
@@ -3407,7 +3187,7 @@ module.exports = function (cstr) {
     return res;
 };
 
-},{"color-convert":5}],18:[function(require,module,exports){
+},{"color-convert":4}],17:[function(require,module,exports){
 var div = null
 var prefixes = [ 'Webkit', 'Moz', 'O', 'ms' ]
 
@@ -3439,7 +3219,7 @@ module.exports = function prefixStyle (prop) {
   return false
 }
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3655,7 +3435,7 @@ function pow(x, n) {
 }
 
 exports.default = binom;
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3684,7 +3464,7 @@ function boxmuller(mean, stdev, n, rng) {
 }
 
 exports.default = boxmuller;
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3855,7 +3635,7 @@ function generate(f, length) {
 }
 
 module.exports = Rands;
-},{"./binom":19,"./boxmuller":20}],22:[function(require,module,exports){
+},{"./binom":18,"./boxmuller":19}],21:[function(require,module,exports){
 var GL_FLOAT = 5126
 
 function AttributeRecord () {
@@ -3894,7 +3674,7 @@ module.exports = function wrapAttributeState (
   }
 }
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var check = require('./util/check')
 var isTypedArray = require('./util/is-typed-array')
 var isNDArrayLike = require('./util/is-ndarray')
@@ -4271,7 +4051,7 @@ module.exports = function wrapBufferState (gl, stats, config) {
   }
 }
 
-},{"./constants/arraytypes.json":24,"./constants/dtypes.json":25,"./constants/usage.json":27,"./util/check":41,"./util/is-ndarray":46,"./util/is-typed-array":47,"./util/pool":49,"./util/values":52}],24:[function(require,module,exports){
+},{"./constants/arraytypes.json":23,"./constants/dtypes.json":24,"./constants/usage.json":26,"./util/check":40,"./util/is-ndarray":45,"./util/is-typed-array":46,"./util/pool":48,"./util/values":51}],23:[function(require,module,exports){
 module.exports={
   "[object Int8Array]": 5120
 , "[object Int16Array]": 5122
@@ -4285,7 +4065,7 @@ module.exports={
 , "[object ArrayBuffer]": 5121
 }
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports={
   "int8": 5120
 , "int16": 5122
@@ -4297,7 +4077,7 @@ module.exports={
 , "float32": 5126
 }
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports={
   "points": 0,
   "point": 0,
@@ -4311,14 +4091,14 @@ module.exports={
   "triangle fan": 6
 }
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports={
   "static": 35044,
   "dynamic": 35048,
   "stream": 35040
 }
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var check = require('./util/check')
 var createEnvironment = require('./util/codegen')
 var loop = require('./util/loop')
@@ -7662,7 +7442,7 @@ module.exports = function reglCore (
   }
 }
 
-},{"./constants/dtypes.json":25,"./constants/primitives.json":26,"./dynamic":29,"./util/check":41,"./util/codegen":43,"./util/is-array-like":45,"./util/is-ndarray":46,"./util/is-typed-array":47,"./util/loop":48}],29:[function(require,module,exports){
+},{"./constants/dtypes.json":24,"./constants/primitives.json":25,"./dynamic":28,"./util/check":40,"./util/codegen":42,"./util/is-array-like":44,"./util/is-ndarray":45,"./util/is-typed-array":46,"./util/loop":47}],28:[function(require,module,exports){
 var VARIABLE_COUNTER = 0
 
 var DYN_FUNC = 0
@@ -7740,7 +7520,7 @@ module.exports = {
   accessor: toAccessorString
 }
 
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 var check = require('./util/check')
 var isTypedArray = require('./util/is-typed-array')
 var isNDArrayLike = require('./util/is-ndarray')
@@ -8023,7 +7803,7 @@ module.exports = function wrapElementsState (gl, extensions, bufferState, stats)
   }
 }
 
-},{"./constants/primitives.json":26,"./constants/usage.json":27,"./util/check":41,"./util/is-ndarray":46,"./util/is-typed-array":47,"./util/values":52}],31:[function(require,module,exports){
+},{"./constants/primitives.json":25,"./constants/usage.json":26,"./util/check":40,"./util/is-ndarray":45,"./util/is-typed-array":46,"./util/values":51}],30:[function(require,module,exports){
 var check = require('./util/check')
 
 module.exports = function createExtensionCache (gl, config) {
@@ -8055,7 +7835,7 @@ module.exports = function createExtensionCache (gl, config) {
   }
 }
 
-},{"./util/check":41}],32:[function(require,module,exports){
+},{"./util/check":40}],31:[function(require,module,exports){
 var check = require('./util/check')
 var values = require('./util/values')
 var extend = require('./util/extend')
@@ -8937,7 +8717,7 @@ module.exports = function wrapFBOState (
   })
 }
 
-},{"./util/check":41,"./util/extend":44,"./util/values":52}],33:[function(require,module,exports){
+},{"./util/check":40,"./util/extend":43,"./util/values":51}],32:[function(require,module,exports){
 var GL_SUBPIXEL_BITS = 0x0D50
 var GL_RED_BITS = 0x0D52
 var GL_GREEN_BITS = 0x0D53
@@ -9031,7 +8811,7 @@ module.exports = function (gl, extensions) {
   }
 }
 
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 var check = require('./util/check')
 var isTypedArray = require('./util/is-typed-array')
 
@@ -9145,7 +8925,7 @@ module.exports = function wrapReadPixels (
   return readPixels
 }
 
-},{"./util/check":41,"./util/is-typed-array":47}],35:[function(require,module,exports){
+},{"./util/check":40,"./util/is-typed-array":46}],34:[function(require,module,exports){
 var check = require('./util/check')
 var values = require('./util/values')
 
@@ -9377,7 +9157,7 @@ module.exports = function (gl, extensions, limits, stats, config) {
   }
 }
 
-},{"./util/check":41,"./util/values":52}],36:[function(require,module,exports){
+},{"./util/check":40,"./util/values":51}],35:[function(require,module,exports){
 var check = require('./util/check')
 var values = require('./util/values')
 
@@ -9588,7 +9368,7 @@ module.exports = function wrapShaderState (gl, stringStore, stats, config) {
   }
 }
 
-},{"./util/check":41,"./util/values":52}],37:[function(require,module,exports){
+},{"./util/check":40,"./util/values":51}],36:[function(require,module,exports){
 
 module.exports = function stats () {
   return {
@@ -9604,7 +9384,7 @@ module.exports = function stats () {
   }
 }
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 module.exports = function createStringStore () {
   var stringIds = {'': 0}
   var stringValues = ['']
@@ -9625,7 +9405,7 @@ module.exports = function createStringStore () {
   }
 }
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var check = require('./util/check')
 var extend = require('./util/extend')
 var values = require('./util/values')
@@ -11194,7 +10974,7 @@ module.exports = function createTextureSet (
   }
 }
 
-},{"./constants/arraytypes.json":24,"./util/check":41,"./util/extend":44,"./util/is-array-like":45,"./util/is-ndarray":46,"./util/is-typed-array":47,"./util/pool":49,"./util/to-half-float":51,"./util/values":52}],40:[function(require,module,exports){
+},{"./constants/arraytypes.json":23,"./util/check":40,"./util/extend":43,"./util/is-array-like":44,"./util/is-ndarray":45,"./util/is-typed-array":46,"./util/pool":48,"./util/to-half-float":50,"./util/values":51}],39:[function(require,module,exports){
 var GL_QUERY_RESULT_EXT = 0x8866
 var GL_QUERY_RESULT_AVAILABLE_EXT = 0x8867
 var GL_TIME_ELAPSED_EXT = 0x88BF
@@ -11330,7 +11110,7 @@ module.exports = function (gl, extensions) {
   }
 }
 
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 // Error checking and parameter validation.
 //
 // Statements for the form `check.someProcedure(...)` get removed by
@@ -11969,14 +11749,14 @@ module.exports = extend(check, {
   textureCube: checkTextureCube
 })
 
-},{"./extend":44,"./is-typed-array":47}],42:[function(require,module,exports){
+},{"./extend":43,"./is-typed-array":46}],41:[function(require,module,exports){
 /* globals performance */
 module.exports =
   (typeof performance !== 'undefined' && performance.now)
   ? function () { return performance.now() }
   : function () { return +(new Date()) }
 
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 var extend = require('./extend')
 
 function slice (x) {
@@ -12160,7 +11940,7 @@ module.exports = function createEnvironment () {
   }
 }
 
-},{"./extend":44}],44:[function(require,module,exports){
+},{"./extend":43}],43:[function(require,module,exports){
 module.exports = function (base, opts) {
   var keys = Object.keys(opts)
   for (var i = 0; i < keys.length; ++i) {
@@ -12169,13 +11949,13 @@ module.exports = function (base, opts) {
   return base
 }
 
-},{}],45:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 var isTypedArray = require('./is-typed-array')
 module.exports = function isArrayLike (s) {
   return Array.isArray(s) || isTypedArray(s)
 }
 
-},{"./is-typed-array":47}],46:[function(require,module,exports){
+},{"./is-typed-array":46}],45:[function(require,module,exports){
 var isTypedArray = require('./is-typed-array')
 
 module.exports = function isNDArrayLike (obj) {
@@ -12190,13 +11970,13 @@ module.exports = function isNDArrayLike (obj) {
       isTypedArray(obj.data)))
 }
 
-},{"./is-typed-array":47}],47:[function(require,module,exports){
+},{"./is-typed-array":46}],46:[function(require,module,exports){
 var dtypes = require('../constants/arraytypes.json')
 module.exports = function (x) {
   return Object.prototype.toString.call(x) in dtypes
 }
 
-},{"../constants/arraytypes.json":24}],48:[function(require,module,exports){
+},{"../constants/arraytypes.json":23}],47:[function(require,module,exports){
 module.exports = function loop (n, f) {
   var result = Array(n)
   for (var i = 0; i < n; ++i) {
@@ -12205,7 +11985,7 @@ module.exports = function loop (n, f) {
   return result
 }
 
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 var loop = require('./loop')
 
 var GL_BYTE = 5120
@@ -12299,7 +12079,7 @@ module.exports = {
   freeType: freeType
 }
 
-},{"./loop":48}],50:[function(require,module,exports){
+},{"./loop":47}],49:[function(require,module,exports){
 /* globals requestAnimationFrame, cancelAnimationFrame */
 if (typeof requestAnimationFrame === 'function' &&
     typeof cancelAnimationFrame === 'function') {
@@ -12316,7 +12096,7 @@ if (typeof requestAnimationFrame === 'function' &&
   }
 }
 
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 var pool = require('./pool')
 
 var FLOAT = new Float32Array(1)
@@ -12362,12 +12142,12 @@ module.exports = function convertToHalfFloat (array) {
   return ushorts
 }
 
-},{"./pool":49}],52:[function(require,module,exports){
+},{"./pool":48}],51:[function(require,module,exports){
 module.exports = function (obj) {
   return Object.keys(obj).map(function (key) { return obj[key] })
 }
 
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 // Context and canvas creation helper functions
 var check = require('./util/check')
 var extend = require('./util/extend')
@@ -12573,7 +12353,7 @@ module.exports = function parseArgs (args_) {
   }
 }
 
-},{"./util/check":41,"./util/extend":44}],54:[function(require,module,exports){
+},{"./util/check":40,"./util/extend":43}],53:[function(require,module,exports){
 var check = require('./lib/util/check')
 var extend = require('./lib/util/extend')
 var dynamic = require('./lib/dynamic')
@@ -13055,7 +12835,7 @@ module.exports = function wrapREGL (args) {
   return regl
 }
 
-},{"./lib/attribute":22,"./lib/buffer":23,"./lib/core":28,"./lib/dynamic":29,"./lib/elements":30,"./lib/extension":31,"./lib/framebuffer":32,"./lib/limits":33,"./lib/read":34,"./lib/renderbuffer":35,"./lib/shader":36,"./lib/stats":37,"./lib/strings":38,"./lib/texture":39,"./lib/timer":40,"./lib/util/check":41,"./lib/util/clock":42,"./lib/util/extend":44,"./lib/util/raf":50,"./lib/webgl":53}],55:[function(require,module,exports){
+},{"./lib/attribute":21,"./lib/buffer":22,"./lib/core":27,"./lib/dynamic":28,"./lib/elements":29,"./lib/extension":30,"./lib/framebuffer":31,"./lib/limits":32,"./lib/read":33,"./lib/renderbuffer":34,"./lib/shader":35,"./lib/stats":36,"./lib/strings":37,"./lib/texture":38,"./lib/timer":39,"./lib/util/check":40,"./lib/util/clock":41,"./lib/util/extend":43,"./lib/util/raf":49,"./lib/webgl":52}],54:[function(require,module,exports){
 // A library of seedable RNGs implemented in Javascript.
 //
 // Usage:
@@ -13117,7 +12897,7 @@ sr.tychei = tychei;
 
 module.exports = sr;
 
-},{"./lib/alea":56,"./lib/tychei":57,"./lib/xor128":58,"./lib/xor4096":59,"./lib/xorshift7":60,"./lib/xorwow":61,"./seedrandom":62}],56:[function(require,module,exports){
+},{"./lib/alea":55,"./lib/tychei":56,"./lib/xor128":57,"./lib/xor4096":58,"./lib/xorshift7":59,"./lib/xorwow":60,"./seedrandom":61}],55:[function(require,module,exports){
 // A port of an algorithm by Johannes Baagøe <baagoe@baagoe.com>, 2010
 // http://baagoe.com/en/RandomMusings/javascript/
 // https://github.com/nquinlan/better-random-numbers-for-javascript-mirror
@@ -13233,7 +13013,7 @@ if (module && module.exports) {
 
 
 
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // A Javascript implementaion of the "Tyche-i" prng algorithm by
 // Samuel Neves and Filipe Araujo.
 // See https://eden.dei.uc.pt/~sneves/pubs/2011-snfa2.pdf
@@ -13338,7 +13118,7 @@ if (module && module.exports) {
 
 
 
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 // A Javascript implementaion of the "xor128" prng algorithm by
 // George Marsaglia.  See http://www.jstatsoft.org/v08/i14/paper
 
@@ -13421,7 +13201,7 @@ if (module && module.exports) {
 
 
 
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 // A Javascript implementaion of Richard Brent's Xorgens xor4096 algorithm.
 //
 // This fast non-cryptographic random number generator is designed for
@@ -13569,7 +13349,7 @@ if (module && module.exports) {
   (typeof define) == 'function' && define   // present with an AMD loader
 );
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 // A Javascript implementaion of the "xorshift7" algorithm by
 // François Panneton and Pierre L'ecuyer:
 // "On the Xorgshift Random Number Generators"
@@ -13668,7 +13448,7 @@ if (module && module.exports) {
 );
 
 
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 // A Javascript implementaion of the "xorwow" prng algorithm by
 // George Marsaglia.  See http://www.jstatsoft.org/v08/i14/paper
 
@@ -13756,7 +13536,7 @@ if (module && module.exports) {
 
 
 
-},{}],62:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /*
 Copyright 2014 David Bau.
 
@@ -14008,7 +13788,7 @@ if ((typeof module) == 'object' && module.exports) {
   Math    // math: package containing random, pow, and seedrandom
 );
 
-},{"crypto":72}],63:[function(require,module,exports){
+},{"crypto":71}],62:[function(require,module,exports){
 
 var space = require('to-space-case')
 
@@ -14031,7 +13811,7 @@ function toCamelCase(string) {
   })
 }
 
-},{"to-space-case":65}],64:[function(require,module,exports){
+},{"to-space-case":64}],63:[function(require,module,exports){
 
 /**
  * Export.
@@ -14100,7 +13880,7 @@ function uncamelize(string) {
   })
 }
 
-},{}],65:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 
 var clean = require('to-no-case')
 
@@ -14123,7 +13903,7 @@ function toSpaceCase(string) {
   }).trim()
 }
 
-},{"to-no-case":64}],66:[function(require,module,exports){
+},{"to-no-case":63}],65:[function(require,module,exports){
 /**
  * Convert array of 16 byte values to UUID string format of the form:
  * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
@@ -14149,7 +13929,7 @@ function bytesToUuid(buf, offset) {
 
 module.exports = bytesToUuid;
 
-},{}],67:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 // Unique ID creation requires a high quality random # generator.  In the
 // browser this is a little complicated due to unknown quality of Math.random()
 // and inconsistent support for the `crypto` API.  We do the best we can via
@@ -14185,7 +13965,7 @@ if (getRandomValues) {
   };
 }
 
-},{}],68:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 var rng = require('./lib/rng');
 var bytesToUuid = require('./lib/bytesToUuid');
 
@@ -14216,7 +13996,7 @@ function v4(options, buf, offset) {
 
 module.exports = v4;
 
-},{"./lib/bytesToUuid":66,"./lib/rng":67}],69:[function(require,module,exports){
+},{"./lib/bytesToUuid":65,"./lib/rng":66}],68:[function(require,module,exports){
 var parse = require('parse-color')
 var isnumber = require('is-number')
 var isstring = require('is-string')
@@ -14327,7 +14107,7 @@ Pixels.prototype.update = function (data) {
 
 module.exports = Pixels
 
-},{"./util/convert":70,"./util/layout":71,"is-array":10,"is-number":12,"is-string":13,"parse-color":17,"regl":54}],70:[function(require,module,exports){
+},{"./util/convert":69,"./util/layout":70,"is-array":9,"is-number":11,"is-string":12,"parse-color":16,"regl":53}],69:[function(require,module,exports){
 var flatten = require('flatten')
 var isarray = require('is-array')
 var isnumber = require('is-number')
@@ -14354,7 +14134,7 @@ function convert (data) {
 
 module.exports = convert
 
-},{"flatten":8,"is-array":10,"is-number":12,"is-string":13,"parse-color":17}],71:[function(require,module,exports){
+},{"flatten":7,"is-array":9,"is-number":11,"is-string":12,"parse-color":16}],70:[function(require,module,exports){
 function layout (rows, columns, padding, size, aspect) {
   var grid = []
 
@@ -14371,9 +14151,9 @@ function layout (rows, columns, padding, size, aspect) {
 
 module.exports = layout
 
-},{}],72:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 
-},{}],73:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -14398,7 +14178,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],74:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -14584,14 +14364,14 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],75:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],76:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -15181,5 +14961,5 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":75,"_process":74,"inherits":73}]},{},[2])(2)
+},{"./support/isBuffer":74,"_process":73,"inherits":72}]},{},[1])(1)
 });

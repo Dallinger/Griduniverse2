@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block body %}
-  <p><code>Score: <span id="score">0</span> points</code></p>
+  <p><code><span id="score">0</span> points ($<span id="dollars">0.00</span>), <span id="clock">1</span> s remaining</code></p>
 {% endblock %}
 
 {% block scripts %}
@@ -25,7 +25,7 @@
     </script>
     <script src="/static/scripts/acsg-dist.js" type="text/javascript"></script>
     <script>
-      game = ACSG({ 'config': {
+      game = acsg.Game({ 'config': {
         NUM_PLAYERS: {{ experiment.num_players }},
         DURATION: {{ experiment.game_duration }},
         INCLUDE_HUMAN: {% if experiment.include_human %}true{% else %}false{% endif %},
@@ -42,7 +42,7 @@
 
       game.run(function () {
         dallinger.createInfo(myNodeId, {
-          contents: game.serialize(),
+          contents: game.serializeActions(),
           info_type: 'Info'
         }).done(function () {
           dallinger.allowExit();

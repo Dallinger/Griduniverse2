@@ -1,5 +1,5 @@
 [Experiment]
-n = 3
+n = 1
 mode = debug
 auto_recruit = true
 num_players = 4
